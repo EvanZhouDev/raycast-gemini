@@ -98,7 +98,7 @@
     }
   ],
   "dependencies": {
-    "@raycast/api": "^1.56.0",
+    "@raycast/api": "^1.62.0",
     "@raycast/utils": "^1.9.0",
     "gemini-ai": "^1.1.0",
     "node-fetch": "^3.3.2",
@@ -106,10 +106,11 @@
   },
   "devDependencies": {
     "@raycast/eslint-config": "1.0.5",
-    "@types/node": "18.8.3",
-    "@types/react": "18.0.9",
+    "@types/node": "^20.8.10",
+    "@types/react": "^18.2.27",
     "eslint": "^7.32.0",
     "prettier": "^2.5.1",
+    "react": "^18.2.0",
     "typescript": "^4.4.3"
   },
   "scripts": {

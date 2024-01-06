@@ -1,4 +1,14 @@
-import { Form, Detail, ActionPanel, Action, Toast, showToast, getSelectedText, getPreferenceValues, popToRoot } from "@raycast/api";
+import {
+  Form,
+  Detail,
+  ActionPanel,
+  Action,
+  Toast,
+  showToast,
+  getSelectedText,
+  getPreferenceValues,
+  popToRoot,
+} from "@raycast/api";
 import { useState, useEffect } from "react";
 import fetch from "node-fetch-polyfill";
 import Gemini from "gemini-ai";
@@ -8,10 +18,10 @@ export default (props, context) => {
   const Pages = {
     Form: 0,
     Detail: 1,
-  }
+  };
   const { query: argQuery } = props.arguments;
   const { apiKey } = getPreferenceValues();
-  const [page, setPage] = useState(Pages.Detail)
+  const [page, setPage] = useState(Pages.Detail);
   const [markdown, setMarkdown] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -29,9 +39,9 @@ export default (props, context) => {
     try {
       await gemini.ask(query, {
         stream: (x) => {
-          setMarkdown(markdown => markdown + x)
+          setMarkdown((markdown) => markdown + x);
         },
-        data: data ?? []
+        data: data ?? [],
       });
 
       await showToast({
@@ -40,19 +50,19 @@ export default (props, context) => {
         message: `${(Date.now() - start) / 1000} seconds`,
       });
     } catch (e) {
-      console.log(e)
+      console.log(e);
       setMarkdown(
         "## Could not access Gemini.\n\nThis may be because Gemini has decided that your prompt did not comply with its regulations. Please try another prompt, and if it still does not work, create an issue on GitHub."
       );
       await showToast({
         style: Toast.Style.Failure,
         title: "Response Failed",
-        message: `${(Date.now() - start) / 1000} seconds`
+        message: `${(Date.now() - start) / 1000} seconds`,
       });
     }
 
     setIsLoading(false);
-  }
+  };
 
   useEffect(() => {
     (async () => {
@@ -61,46 +71,45 @@ export default (props, context) => {
           let selected = await getSelectedText();
           getResponse(`${context}\n${selected}`);
         } catch (e) {
-          await popToRoot()
+          await popToRoot();
           await showToast({
             style: Toast.Style.Failure,
             title: "Could not get the selected text",
           });
         }
-
       } else {
         if (argQuery === "") {
-          setPage(Pages.Form)
+          setPage(Pages.Form);
         } else {
           getResponse(argQuery);
         }
       }
-    })()
-  }, [])
+    })();
+  }, []);
 
-  return (
-    page === Pages.Detail ? <Detail isLoading={isLoading} markdown={markdown} /> :
-      <Form
-        actions={
-          <ActionPanel>
-            <Action.SubmitForm
-              onSubmit={(values) => {
-                setMarkdown("");
+  return page === Pages.Detail ? (
+    <Detail isLoading={isLoading} markdown={markdown} />
+  ) : (
+    <Form
+      actions={
+        <ActionPanel>
+          <Action.SubmitForm
+            onSubmit={(values) => {
+              setMarkdown("");
 
-                const files = values.files.filter((file) => fs.existsSync(file) && fs.lstatSync(file).isFile()).map(file => fs.readFileSync(file));
+              const files = values.files
+                .filter((file) => fs.existsSync(file) && fs.lstatSync(file).isFile())
+                .map((file) => fs.readFileSync(file));
 
-                getResponse(`${context ? `${context}\n\n` : ""}${values.query}`, files);
-              }}
-            />
-          </ActionPanel>
-        }
-      >
-        <Form.TextArea title="Prompt" id="query" />
-        <Form.Description
-          title="Files"
-          text="Images that you want Gemini to analyze along with your prompt."
-        />
-        <Form.FilePicker id="files" title=""/>
-      </Form>
-  )
+              getResponse(`${context ? `${context}\n\n` : ""}${values.query}`, files);
+            }}
+          />
+        </ActionPanel>
+      }
+    >
+      <Form.TextArea title="Prompt" id="query" />
+      <Form.Description title="Files" text="Images that you want Gemini to analyze along with your prompt." />
+      <Form.FilePicker id="files" title="" />
+    </Form>
+  );
 };
