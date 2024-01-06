@@ -109,7 +109,7 @@ export default (props, context) => {
     >
       <Form.TextArea title="Prompt" id="query" />
       <Form.Description title="Files" text="Images that you want Gemini to analyze along with your prompt." />
-      <Form.FilePicker id="files" title="" />
+      <Form.FilePicker id="files" title="" allowMultipleSelection={false} />
     </Form>
   );
 };
