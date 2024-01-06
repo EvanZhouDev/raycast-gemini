@@ -88,16 +88,18 @@ export default (props, context, allowPaste = false) => {
   }, []);
 
   return page === Pages.Detail ? (
-    <Detail actions={
-      !isLoading &&
-      <ActionPanel>
-        {allowPaste && <Action.Paste content={markdown} />}
-        <Action.CopyToClipboard
-          content={markdown}
-        />
-      </ActionPanel>
-    }
-      isLoading={isLoading} markdown={markdown} />
+    <Detail
+      actions={
+        !isLoading && (
+          <ActionPanel>
+            {allowPaste && <Action.Paste content={markdown} />}
+            <Action.CopyToClipboard content={markdown} />
+          </ActionPanel>
+        )
+      }
+      isLoading={isLoading}
+      markdown={markdown}
+    />
   ) : (
     <Form
       actions={
