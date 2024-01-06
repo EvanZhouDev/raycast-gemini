@@ -85,28 +85,37 @@ export default function Chat() {
                         });
 
                         (async () => {
-                            let currentChat = getChat(chatData.currentChat)
-                            let aiChat = gemini.createChat({
-                                messages: currentChat.messages.map(x => [x.prompt, x.answer])
-                            });
+                            try {
+                                let currentChat = getChat(chatData.currentChat)
+                                let aiChat = gemini.createChat({
+                                    messages: currentChat.messages.map(x => [x.prompt, x.answer])
+                                });
 
-                            await aiChat.ask(query, {
-                                stream: (x) => {
-                                    setChatData(oldData => {
-                                        let newChatData = structuredClone(oldData);
-                                        getChat(chatData.currentChat, newChatData.chats).messages[0].answer += x;
-                                        return newChatData;
-                                    })
-                                }
-                            })
+                                await aiChat.ask(query, {
+                                    stream: (x) => {
+                                        setChatData(oldData => {
+                                            let newChatData = structuredClone(oldData);
+                                            getChat(chatData.currentChat, newChatData.chats).messages[0].answer += x;
+                                            return newChatData;
+                                        })
+                                    }
+                                })
 
-                            setChatData(oldData => {
-                                let newChatData = structuredClone(oldData);
-                                getChat(chatData.currentChat, newChatData.chats).messages[0].finished = true;
-                                return newChatData;
-                            })
+                                setChatData(oldData => {
+                                    let newChatData = structuredClone(oldData);
+                                    getChat(chatData.currentChat, newChatData.chats).messages[0].finished = true;
+                                    return newChatData;
+                                })
 
-                            toast(Toast.Style.Success, "Response Loaded");
+                                toast(Toast.Style.Success, "Response Loaded");
+                            } catch {
+                                setChatData(oldData => {
+                                    let newChatData = structuredClone(oldData);
+                                    getChat(chatData.currentChat, newChatData.chats).messages.shift();
+                                    return newChatData;
+                                })
+                                toast(Toast.Style.Failure, "Gemini cannot process this message.");
+                            }
                         })()
                         return newChatData;
                     })
@@ -218,23 +227,32 @@ export default function Chat() {
                     console.log(toast)
                     toast(Toast.Style.Animated, "Regenerating Last Message");
                     (async () => {
-                        await aiChat.ask(getChat(newData.currentChat, newData.chats).messages[0].prompt, {
-                            stream: (x) => {
-                                setChatData(oldData => {
-                                    let newChatData = structuredClone(oldData);
-                                    getChat(newData.currentChat, newChatData.chats).messages[0].answer += x;
-                                    return newChatData;
-                                })
-                            }
-                        })
+                        try {
+                            await aiChat.ask(getChat(newData.currentChat, newData.chats).messages[0].prompt, {
+                                stream: (x) => {
+                                    setChatData(oldData => {
+                                        let newChatData = structuredClone(oldData);
+                                        getChat(newData.currentChat, newChatData.chats).messages[0].answer += x;
+                                        return newChatData;
+                                    })
+                                }
+                            })
 
-                        setChatData(oldData => {
-                            let newChatData = structuredClone(oldData);
-                            getChat(newData.currentChat, newChatData.chats).messages[0].finished = true;
-                            return newChatData;
-                        })
+                            setChatData(oldData => {
+                                let newChatData = structuredClone(oldData);
+                                getChat(newData.currentChat, newChatData.chats).messages[0].finished = true;
+                                return newChatData;
+                            })
 
-                        toast(Toast.Style.Success, "Response Loaded");
+                            toast(Toast.Style.Success, "Response Loaded");
+                        } catch {
+                            setChatData(oldData => {
+                                let newChatData = structuredClone(oldData);
+                                getChat(newData.currentChat, newChatData.chats).messages.shift();
+                                return newChatData;
+                            })
+                            toast(Toast.Style.Failure, "Gemini cannot process this message.");
+                        }
                     })()
                 }
 
