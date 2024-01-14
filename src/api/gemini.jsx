@@ -10,7 +10,8 @@ import {
   popToRoot,
   Keyboard,
   launchCommand,
-  LaunchType
+  LaunchType,
+  Icon
 } from "@raycast/api";
 import { useState, useEffect } from "react";
 import fetch from "node-fetch-polyfill";
@@ -118,9 +119,10 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
           <ActionPanel>
             {allowPaste && <Action.Paste content={markdown} />}
             <Action.CopyToClipboard shortcut={Keyboard.Shortcut.Common.Copy} content={markdown} />
-            {(lastQuery && lastResponse) && <Action title="Continue in Chat" onAction={async () => {
-              await launchCommand({ name: "aiChat", type: LaunchType.UserInitiated, context: { query: lastQuery, response: lastResponse, creationName: "" } });
-            }} />}
+            {(lastQuery && lastResponse) && <Action title="Continue in Chat"
+              icon={Icon.Message} shortcut={{ modifiers: ["cmd"], key: "j" }} onAction={async () => {
+                await launchCommand({ name: "aiChat", type: LaunchType.UserInitiated, context: { query: lastQuery, response: lastResponse, creationName: "" } });
+              }} />}
           </ActionPanel>
         )
       }
@@ -156,6 +158,7 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
       {!buffer.length && <>
         <Form.Description title="Image" text="Image that you want Gemini to analyze along with your prompt." />
         <Form.FilePicker id="files" title="" allowMultipleSelection={false} />
+        <Form.Description text="Note that image data will not be carried over if you continue in Chat." />
       </>}
     </Form>
   );
