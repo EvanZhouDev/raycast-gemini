@@ -8,6 +8,7 @@ import {
   getSelectedText,
   getPreferenceValues,
   popToRoot,
+  Keyboard
 } from "@raycast/api";
 import { useState, useEffect } from "react";
 import fetch from "node-fetch-polyfill";
@@ -93,7 +94,7 @@ export default (props, context, allowPaste = false) => {
         !isLoading && (
           <ActionPanel>
             {allowPaste && <Action.Paste content={markdown} />}
-            <Action.CopyToClipboard content={markdown} />
+            <Action.CopyToClipboard shortcut={Keyboard.Shortcut.Common.Copy} content={markdown} />
           </ActionPanel>
         )
       }
