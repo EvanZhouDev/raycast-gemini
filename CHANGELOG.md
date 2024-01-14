@@ -2,7 +2,7 @@
 
 ## [Ask About Screen & More!] - 2023-01-13
 
-Ask about what's on your screen right now with the new `Ask About Your Screen` command! [TODO]
+Ask about what's on your screen right now with the new `Ask About Your Screen` command!
 
 More Features:
 - 🔍 Ask About Selected Text: Give AI a custom instruction about your selected text!
@@ -12,7 +12,7 @@ More Features:
 Fixes:
 - 📋 Copying text now has a dedicated shortcut, instead of ⌘Enter
 - 📝 "Quick AI" is now "Ask AI", to match Raycast AI
-- 🌟 New Material Icons for commands [TODO]
+- 🌟 New Material Icons for commands
 - 🖋️ Better descriptions for commands [TODO]
 
 ## [Initial Version] - 2023-01-06
