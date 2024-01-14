@@ -1,5 +1,10 @@
 import useGemini from "./api/gemini";
+import { environment } from "@raycast/api";
 
 export default function AskAI(props) {
-  return useGemini(props);
+  if (props?.launchContext?.buffer) {
+    return useGemini({ ...props, arguments: props?.launchContext?.args }, { buffer: props?.launchContext?.buffer });
+  } else {
+    return useGemini(props, {});
+  }
 }

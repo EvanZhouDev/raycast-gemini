@@ -15,7 +15,7 @@ import fetch from "node-fetch-polyfill";
 import Gemini from "gemini-ai";
 import fs from "fs";
 
-export default (props, context, allowPaste = false) => {
+export default (props, { context = undefined, allowPaste = false, useSelected = false, buffer = [] }) => {
   const Pages = {
     Form: 0,
     Detail: 1,
@@ -25,6 +25,7 @@ export default (props, context, allowPaste = false) => {
   const [page, setPage] = useState(Pages.Detail);
   const [markdown, setMarkdown] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedState, setSelected] = useState("");
 
   const getResponse = async (query, data) => {
     setPage(Pages.Detail);
@@ -38,11 +39,12 @@ export default (props, context, allowPaste = false) => {
     const gemini = new Gemini(apiKey, { fetch });
 
     try {
+      console.log(query, data ?? buffer)
       await gemini.ask(query, {
         stream: (x) => {
           setMarkdown((markdown) => markdown + x);
         },
-        data: data ?? [],
+        data: data ?? buffer,
       });
 
       await showToast({
@@ -67,11 +69,21 @@ export default (props, context, allowPaste = false) => {
 
   useEffect(() => {
     (async () => {
-      if (context) {
+      if (context || useSelected) {
         try {
           let selected = await getSelectedText();
+          if (useSelected) {
+            if (argQuery === "") {
+              setSelected(selected);
+              setPage(Pages.Form);
+            } else {
+              getResponse(`${argQuery}\n${selected}`);
+            }
+            return;
+          }
           getResponse(`${context}\n${selected}`);
         } catch (e) {
+          console.error(e)
           await popToRoot();
           await showToast({
             style: Toast.Style.Failure,
@@ -109,10 +121,17 @@ export default (props, context, allowPaste = false) => {
             onSubmit={(values) => {
               setMarkdown("");
 
-              const files = values.files
-                .filter((file) => fs.existsSync(file) && fs.lstatSync(file).isFile())
-                .map((file) => fs.readFileSync(file));
+              let files = undefined;
+              if (values.files) {
+                files = values.files
+                  .filter((file) => fs.existsSync(file) && fs.lstatSync(file).isFile())
+                  .map((file) => fs.readFileSync(file));
+              }
 
+              if (useSelected) {
+                getResponse(`${values.query}\n${selectedState}`, files);
+                return;
+              }
               getResponse(`${context ? `${context}\n\n` : ""}${values.query}`, files);
             }}
           />
@@ -120,8 +139,10 @@ export default (props, context, allowPaste = false) => {
       }
     >
       <Form.TextArea title="Prompt" id="query" />
-      <Form.Description title="Image" text="Image that you want Gemini to analyze along with your prompt." />
-      <Form.FilePicker id="files" title="" allowMultipleSelection={false} />
+      {!buffer.length && <>
+        <Form.Description title="Image" text="Image that you want Gemini to analyze along with your prompt." />
+        <Form.FilePicker id="files" title="" allowMultipleSelection={false} />
+      </>}
     </Form>
   );
 };
