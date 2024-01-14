@@ -20,7 +20,8 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
     Form: 0,
     Detail: 1,
   };
-  const { query: argQuery } = props.arguments;
+  let { query: argQuery } = props.arguments;
+  if (!argQuery) argQuery = props.fallbackText;
   const { apiKey } = getPreferenceValues();
   const [page, setPage] = useState(Pages.Detail);
   const [markdown, setMarkdown] = useState("");
