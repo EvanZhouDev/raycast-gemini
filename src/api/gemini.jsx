@@ -11,7 +11,7 @@ import {
   Keyboard,
   launchCommand,
   LaunchType,
-  Icon
+  Icon,
 } from "@raycast/api";
 import { useState, useEffect } from "react";
 import fetch from "node-fetch-polyfill";
@@ -47,12 +47,10 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
     const gemini = new Gemini(apiKey, { fetch });
 
     try {
-      console.log(query, data ?? buffer)
+      console.log(query, data ?? buffer);
       let response = await gemini.ask(query, {
         stream: (x) => {
-          try {
-            setMarkdown((markdown) => markdown + x);
-          } catch { }
+          setMarkdown((markdown) => markdown + x);
         },
         data: data ?? buffer,
       });
@@ -95,7 +93,7 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
           }
           getResponse(`${context}\n${selected}`);
         } catch (e) {
-          console.error(e)
+          console.error(e);
           await popToRoot();
           await showToast({
             style: Toast.Style.Failure,
@@ -119,10 +117,20 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
           <ActionPanel>
             {allowPaste && <Action.Paste content={markdown} />}
             <Action.CopyToClipboard shortcut={Keyboard.Shortcut.Common.Copy} content={markdown} />
-            {(lastQuery && lastResponse) && <Action title="Continue in Chat"
-              icon={Icon.Message} shortcut={{ modifiers: ["cmd"], key: "j" }} onAction={async () => {
-                await launchCommand({ name: "aiChat", type: LaunchType.UserInitiated, context: { query: lastQuery, response: lastResponse, creationName: "" } });
-              }} />}
+            {lastQuery && lastResponse && (
+              <Action
+                title="Continue in Chat"
+                icon={Icon.Message}
+                shortcut={{ modifiers: ["cmd"], key: "j" }}
+                onAction={async () => {
+                  await launchCommand({
+                    name: "aiChat",
+                    type: LaunchType.UserInitiated,
+                    context: { query: lastQuery, response: lastResponse, creationName: "" },
+                  });
+                }}
+              />
+            )}
           </ActionPanel>
         )
       }
@@ -155,11 +163,13 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
       }
     >
       <Form.TextArea title="Prompt" id="query" />
-      {!buffer.length && <>
-        <Form.Description title="Image" text="Image that you want Gemini to analyze along with your prompt." />
-        <Form.FilePicker id="files" title="" allowMultipleSelection={false} />
-        <Form.Description text="Note that image data will not be carried over if you continue in Chat." />
-      </>}
+      {!buffer.length && (
+        <>
+          <Form.Description title="Image" text="Image that you want Gemini to analyze along with your prompt." />
+          <Form.FilePicker id="files" title="" allowMultipleSelection={false} />
+          <Form.Description text="Note that image data will not be carried over if you continue in Chat." />
+        </>
+      )}
     </Form>
   );
 };
