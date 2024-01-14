@@ -12,8 +12,8 @@
   "license": "MIT",
   "commands": [
     {
-      "name": "quickAI",
-      "title": "Quick AI",
+      "name": "askAI",
+      "title": "Ask AI",
       "subtitle": "Google Gemini",
       "description": "Ask Google's Gemini Pro",
       "mode": "view",
