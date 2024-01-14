@@ -9,10 +9,10 @@ export default async function AskAboutScreenContent(props) {
 
   const execPromise = util.promisify(exec);
 
-  await execPromise(`/usr/sbin/screencapture ${environment.assetsPath}/test.png`);
-  const image = await jimp.read(`${environment.assetsPath}/test.png`);
+  await execPromise(`/usr/sbin/screencapture ${environment.assetsPath}/desktopScreenshot.png`);
+  const image = await jimp.read(`${environment.assetsPath}/desktopScreenshot.png`);
   image.resize(1440, jimp.AUTO);
-  await image.writeAsync(`${environment.assetsPath}/resized.png`);
+  await image.writeAsync(`${environment.assetsPath}/desktopScreenshotResized.png`);
 
-  await launchCommand({ name: "askAI", type: LaunchType.UserInitiated, context: { buffer: [fs.readFileSync(`${environment.assetsPath}/resized.png`)], args: props.arguments } })
+  await launchCommand({ name: "askAI", type: LaunchType.UserInitiated, context: { buffer: [fs.readFileSync(`${environment.assetsPath}/desktopScreenshotResized.png`)], args: props.arguments } })
 }
