@@ -6,14 +6,14 @@ Ask about what's on your screen right now with the new `Ask About Your Screen` c
 
 More Features:
 - 🔍 Ask About Selected Text: Give AI a custom instruction about your selected text!
-- 📩 Send to Chat: Go from your Quick AI prompts straight to a new chat! [TODO]
-- 🔄 Fallback Command Support: Add Gemini to your fallback arsenal! [TODO]
+- 📩 Send to Chat: Go from your Quick AI prompts straight to a new chat!
+- 🔄 Fallback Command Support: Add Gemini to your fallback arsenal!
 
 Fixes:
 - 📋 Copying text now has a dedicated shortcut, instead of ⌘Enter
 - 📝 "Quick AI" is now "Ask AI", to match Raycast AI
 - 🌟 New Material Icons for commands
-- 🖋️ Better descriptions for commands [TODO]
+- 🖋️ Better descriptions for commands
 
 ## [Initial Version] - 2023-01-06
 

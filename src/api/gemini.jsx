@@ -8,7 +8,9 @@ import {
   getSelectedText,
   getPreferenceValues,
   popToRoot,
-  Keyboard
+  Keyboard,
+  launchCommand,
+  LaunchType
 } from "@raycast/api";
 import { useState, useEffect } from "react";
 import fetch from "node-fetch-polyfill";
@@ -21,14 +23,18 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
     Detail: 1,
   };
   let { query: argQuery } = props.arguments;
-  if (!argQuery) argQuery = props.fallbackText;
+  if (!argQuery) argQuery = props.fallbackText ?? "";
+
   const { apiKey } = getPreferenceValues();
   const [page, setPage] = useState(Pages.Detail);
   const [markdown, setMarkdown] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [selectedState, setSelected] = useState("");
+  const [lastQuery, setLastQuery] = useState("");
+  const [lastResponse, setLastResponse] = useState("");
 
   const getResponse = async (query, data) => {
+    setLastQuery(query);
     setPage(Pages.Detail);
 
     await showToast({
@@ -41,12 +47,16 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
 
     try {
       console.log(query, data ?? buffer)
-      await gemini.ask(query, {
+      let response = await gemini.ask(query, {
         stream: (x) => {
-          setMarkdown((markdown) => markdown + x);
+          try {
+            setMarkdown((markdown) => markdown + x);
+          } catch { }
         },
         data: data ?? buffer,
       });
+      setMarkdown(response);
+      setLastResponse(response);
 
       await showToast({
         style: Toast.Style.Success,
@@ -108,6 +118,9 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
           <ActionPanel>
             {allowPaste && <Action.Paste content={markdown} />}
             <Action.CopyToClipboard shortcut={Keyboard.Shortcut.Common.Copy} content={markdown} />
+            {(lastQuery && lastResponse) && <Action title="Continue in Chat" onAction={async () => {
+              await launchCommand({ name: "aiChat", type: LaunchType.UserInitiated, context: { query: lastQuery, response: lastResponse, creationName: "" } });
+            }} />}
           </ActionPanel>
         )
       }
